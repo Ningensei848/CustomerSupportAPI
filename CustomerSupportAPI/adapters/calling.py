@@ -18,7 +18,7 @@ class CallingAdapter:
         )
 
     @classmethod
-    def from_multi_model(cls, instances):  # type of instances is `django Queryset`
+    def from_qs(cls, instances):  # type of instances is `django Queryset`
         return Callings(records=[cls.from_model(inst) for inst in instances])
     # def from_req():
     # def from_multi_req():

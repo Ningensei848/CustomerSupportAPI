@@ -14,7 +14,7 @@ router = APIRouter()
 def get_callings(
     callings: List[CallingModel] = Depends(crud.retrieve_all_callings),
 ) -> Callings:
-    return CallingAdapter.from_multi_model(callings)
+    return CallingAdapter.from_qs(callings)
 
 
 @router.get("/{calling_id}")
