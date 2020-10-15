@@ -2,6 +2,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,linux,macos,vim,emacs,git,pycharm+all,jupyternotebooks,virtualenv,microsoftoffice,django
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,windows,linux,macos,vim,emacs,git,pycharm+all,jupyternotebooks,virtualenv,microsoftoffice,django
 
+
+### user add ###
+
+static/
+
 ### Django ###
 *.log
 *.pot
