@@ -1,6 +1,6 @@
 
-from CustomerSupportAPI.models.calling import CallingModel  # and,  CallingBase
-from CustomerSupportAPI.schemas.calling import Calling, Callings
+from CustomerSupportAPI.models.calling import CallingModel
+from CustomerSupportAPI.schemas.calling import CallingBase, Calling, Callings
 
 
 class CallingAdapter:
@@ -20,5 +20,32 @@ class CallingAdapter:
     @classmethod
     def from_qs(cls, instances):  # type of instances is `django Queryset`
         return Callings(records=[cls.from_model(inst) for inst in instances])
-    # def from_req():
+
+    @classmethod
+    def from_req(cls, schema: CallingBase):
+        """
+        Return a CallingModel instance(django) from an CallingBase instance(fastapi schema).
+        => convert fastapi schema to Django instance.
+        """
+        return CallingModel(
+            name=schema.name,
+            phone_number=schema.phone_number,
+            affiliation=schema.affiliation,
+        )
+
     # def from_multi_req():
+
+    @classmethod
+    def validate_calling_id(cls, schema: Calling) -> CallingModel:
+        """
+        もしidがなければ，Django側でIDをインクリメントする（ために，idを削除する）
+        あれば，フロント側でIDを指定してPOSTしてきたことになる（からなにもしない）
+        """
+        calling_dict = schema.dict()
+        if calling_dict['id'] is None:
+            del calling_dict['id']
+            inst = CallingModel(**calling_dict)
+            inst.save()  # 未登録のデータを保存
+        else:
+            inst = CallingModel(**calling_dict)
+        return inst

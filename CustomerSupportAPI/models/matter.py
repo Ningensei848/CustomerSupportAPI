@@ -16,7 +16,7 @@ class MatterModel(models.Model):
     id_: 一意に識別できるようなID
     timestamp: データを入力した時刻（≒電話を受けた時刻）
     responder: 電話を受けた人
-    calling: 電話をかけてきた人
+    caller: 電話をかけてきた人
         name: 名前
         phone_number: 電話番号
         affiliation: 所属 (optional)

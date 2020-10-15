@@ -14,7 +14,7 @@ class MatterBase(BaseModel):
     memo: str
 
     # Optional ---------------------------------------------
-    title: Optional[constr(max_length=255, strip_whitespace=True)] = None  # default is 'タイトル未設定 ({timestamp})'
+    title: Optional[constr(max_length=255, strip_whitespace=True)]  # default is 'タイトル未設定 ({timestamp})'
     place: Optional[constr(max_length=255, strip_whitespace=True)] = None
     dt: Optional[date] = None
     t: Optional[time] = None

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from CustomerSupportAPI.crud import calling as crud
 from CustomerSupportAPI.models.calling import CallingModel
-from CustomerSupportAPI.schemas.calling import Calling, Callings
+from CustomerSupportAPI.schemas.calling import CallingBase, Calling, Callings
 from CustomerSupportAPI.adapters.calling import CallingAdapter
 
 
@@ -23,8 +23,11 @@ def get_calling(
 ) -> Calling:
     return CallingAdapter.from_model(calling)
 
-# routerはadapterが取ってきた「django」modelのインスタンスの依存性を検証し，
-# args: , return: None(or message)
-# @router.post("/create")
-# def post_calling(calling: CallingModel = Depends(adapter.retrieve_calling_by_id)  ):
-#     return
+
+@router.post("/create")
+def post_calling(calling: CallingBase) -> Calling:
+    instance = crud.create_object(CallingAdapter.from_req(calling))
+    return CallingAdapter.from_model(instance)
+
+# delete
+# update
