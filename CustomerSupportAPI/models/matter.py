@@ -1,8 +1,13 @@
 from django.db import models
+from django.utils import timezone
 
-import uuid
+from uuid import uuid4
 
 from .calling import CallingModel
+
+
+def title_default() -> str:
+    return 'タイトル未設定 ({timestamp})'.format(timestamp=timezone.now().strftime('%Y-%m-%d %H:%M'))
 
 
 class MatterModel(models.Model):
@@ -23,9 +28,9 @@ class MatterModel(models.Model):
     """
 
     # set default automatically via db or front page. -----------------------------------------------------------
-    id_ = models.UUIDField(
+    id = models.UUIDField(  # cf. "Is it safe to name field as 'id' in Django model? | stackoverflow" https://bit.ly/3lDrmKC
         primary_key=True,
-        default=uuid.uuid4,  # cf. https://docs.djangoproject.com/en/3.1/ref/models/fields/#uuidfield
+        default=uuid4,  # cf. https://docs.djangoproject.com/en/3.1/ref/models/fields/#uuidfield
         editable=False,
         verbose_name='matter_id',
         help_text='It is an ID that can be assigned to a record so that it can be uniquely identified for each matter.'
@@ -44,7 +49,7 @@ class MatterModel(models.Model):
     )   # TODO: merge own DB already
 
     # Minimum Information **Required**. ----------------------------------------------------------
-    calling = models.ForeignKey(
+    caller = models.ForeignKey(
         CallingModel,
         on_delete=models.PROTECT,
         verbose_name='発信者',
@@ -58,8 +63,7 @@ class MatterModel(models.Model):
     # Necessary, if possible. --------------------------------------------------------------------
     title = models.CharField(
         max_length=255,
-        blank=True,
-        null=True,
+        default=title_default,  # cf. https://docs.djangoproject.com/en/3.1/ref/models/fields/#default
         verbose_name='要件',
         help_text='If you had one keyword to tell your colleagues about this telephone, it would be ...'
     )
@@ -91,5 +95,9 @@ class MatterModel(models.Model):
         help_text='When do we have to call back to customer by?'
     )
 
+    def __str__(self):
+        return self.title
+
     class Meta:
-        verbose_name_plural = '問い合わせ'
+        verbose_name_plural = 'お問い合わせ内容'
+        get_latest_by = ['-call_back_by', 'timestamp']
