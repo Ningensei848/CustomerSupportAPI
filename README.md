@@ -36,8 +36,8 @@ FastAPIのORMとしてDjangoを採用したAPIサーバを作る．
 
 # Deployment
 
-- `pipenv run uvicorn mysite.asgi:fastapi --reload`
-- `pipenv run uvicorn mysite.asgi.application --port 8001 --reload`
+- `pipenv run uvicorn mysite.asgi:fastapp --reload`
+- `pipenv run gunicorn mysite.asgi:application -w 4 -k uvicorn.workers.UvicornWorker -b localhost:8001`
 
 # Contributors
 
