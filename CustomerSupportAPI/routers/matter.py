@@ -1,25 +1,24 @@
 from typing import List
+from fastapi import APIRouter, Depends
 
-from fastapi import APIRouter
-from fastapi import Depends
-
-
-from CustomerSupportAPI.adapters import matter as adapter
+from CustomerSupportAPI.crud import matter as crud
 from CustomerSupportAPI.models.matter import MatterModel
 from CustomerSupportAPI.schemas.matter import Matter, Matters
+from CustomerSupportAPI.adapters.matter import MatterAdapter
+
 
 router = APIRouter()
 
 
 @router.get("/")
 def get_matters(
-    matters: List[MatterModel] = Depends(adapter.retrieve_all_matters),
+    matters: List[MatterModel] = Depends(crud.retrieve_all_matters),
 ) -> Matters:
-    return Matters.from_model_multiple(matters)
+    return MatterAdapter.from_qs(matters)
 
 
 @router.get("/{matter_id}")
 def get_matter(
-    matter: MatterModel = Depends(adapter.retrieve_matter_by_id),
+    matter: MatterModel = Depends(crud.retrieve_matter_by_id),
 ) -> Matter:
-    return Matter.from_model(matter)
+    return MatterAdapter.from_model(matter)

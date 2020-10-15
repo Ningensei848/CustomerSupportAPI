@@ -1,27 +1,24 @@
-from typing import Type, TypeVar
-from fastapi import HTTPException, Path
-from django.db import models
 
-from CustomerSupportAPI.models.calling import CallingModel
+from CustomerSupportAPI.models.calling import CallingModel  # and,  CallingBase
+from CustomerSupportAPI.schemas.calling import Calling, Callings
 
 
-modelType = TypeVar("modelType", bound=models.Model)
+class CallingAdapter:
 
-# `->` is type annotation of return value(s)
+    @classmethod
+    def from_model(cls, instance: CallingModel):
+        """
+        Convert Django Model Instance To Schema instance in Pydantic
+        """
+        return Calling(
+            id=instance.id,
+            name=instance.name,
+            phone_number=str(instance.phone_number),  # cf. https://github.com/stefanfoulis/django-phonenumber-field/blob/7a5d8010c182058dc8d0e1e20cf66f541860eb73/phonenumber_field/phonenumber.py#L34
+            affiliation=instance.affiliation
+        )
 
-
-def retieve_object_by_id(model_class: Type[modelType], id: int) -> modelType:
-    instance = model_class.objects.filter(pk=id).first()
-    if not instance:
-        raise HTTPException(status_code=404, detail="Object not found.")
-    return instance
-
-
-def retrieve_calling_by_id(
-    calling_id: int = Path(..., description="retrive calling from db")
-) -> CallingModel:
-    return retieve_object_by_id(CallingModel, calling_id)  # return `Django model` instance
-
-
-def retrieve_all_callings():
-    return CallingModel.objects.all()
+    @classmethod
+    def from_multi_model(cls, instances):  # type of instances is `django Queryset`
+        return Callings(records=[cls.from_model(inst) for inst in instances])
+    # def from_req():
+    # def from_multi_req():

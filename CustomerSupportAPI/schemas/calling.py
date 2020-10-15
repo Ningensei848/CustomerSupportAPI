@@ -1,4 +1,3 @@
-
 # cf. https://github.com/daviddrysdale/python-phonenumbers
 # cf. https://github.com/samuelcolvin/pydantic/issues/1551#issuecomment-700154597
 
@@ -16,12 +15,8 @@ from pydantic import BaseModel, constr, PositiveInt, validator
 
 MOBILE_NUMBER_TYPES = PhoneNumberType.MOBILE, PhoneNumberType.FIXED_LINE_OR_MOBILE
 
-from CustomerSupportAPI.models.calling import CallingModel
 
-
-class Calling(BaseModel):
-
-    id: PositiveInt  # for default django auto-incremental ID
+class CallingBase(BaseModel):
     name: constr(max_length=255, strip_whitespace=True)
     phone_number: constr(max_length=50, strip_whitespace=True)
 
@@ -39,19 +34,11 @@ class Calling(BaseModel):
 
         return format_number(n, PhoneNumberFormat.NATIONAL if n.country_code == 81 else PhoneNumberFormat.INTERNATIONAL)
 
-    @classmethod
-    def from_model(cls, instance: CallingModel):
-        return cls(
-            id=instance.id,
-            name=instance.name,
-            phone_number=str(instance.phone_number),  # cf. https://github.com/stefanfoulis/django-phonenumber-field/blob/7a5d8010c182058dc8d0e1e20cf66f541860eb73/phonenumber_field/phonenumber.py#L34
-            affiliation=instance.affiliation
-        )
+
+class Calling(CallingBase):
+
+    id: PositiveInt  # for default django auto-incremental ID
 
 
 class Callings(BaseModel):
     records: List[Calling]
-
-    @ classmethod
-    def from_model_multiple(cls, instances):
-        return cls(records=[Calling.from_model(inst) for inst in instances])

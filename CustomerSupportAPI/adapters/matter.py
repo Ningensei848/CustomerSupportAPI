@@ -1,34 +1,32 @@
-from typing import Type, TypeVar
-from pydantic import UUID4
-from fastapi import HTTPException, Path
-from django.db import models
 
-from CustomerSupportAPI.models.matter import MatterModel
+from CustomerSupportAPI.models.matter import MatterModel  # and,  MatterBase
+from CustomerSupportAPI.schemas.matter import Matter, Matters
 
-modelType = TypeVar("modelType", bound=models.Model)
+from .calling import CallingAdapter
 
 
-# GET object(s) ------------------------------------------------------------------
+class MatterAdapter:
 
+    @classmethod
+    def from_model(cls, instance: MatterModel):
+        """
+        Convert Django Model Instance To Schema instance in Pydantic
+        """
+        return Matter(
+            id=instance.id,
+            timestamp=instance.timestamp,
+            responder=instance.responder,
+            caller=CallingAdapter.from_model(instance.caller),  # for ForeignKey
+            memo=instance.memo,
+            title=instance.title,
+            place=instance.place,
+            dt=instance.date,
+            t=instance.time,
+            call_back_by=instance.call_back_by
+        )
 
-def retieve_object_by_id(model_class: Type[modelType], id: UUID4) -> modelType:
-    instance = model_class.objects.filter(pk=id).first()
-    if not instance:
-        raise HTTPException(status_code=404, detail="Object not found.")
-    return instance
-
-
-def retrieve_matter_by_id(
-    matter_id: UUID4 = Path(..., description="retrive matter from db")
-) -> MatterModel:
-    return retieve_object_by_id(MatterModel, matter_id)
-
-
-def retrieve_all_matters():
-    return MatterModel.objects.all()
-
-# --------------------------------------------------------------------------------
-# POST object(s) -----------------------------------------------------------------
-
-
-# def register_object(model_class: Type[modelType], id: UUID4) -> modelType:
+    @classmethod
+    def from_qs(cls, instances):  # type of instances is `django Queryset`
+        return Matters(records=[cls.from_model(inst) for inst in instances])
+    # def from_req():
+    # def from_multi_req():
