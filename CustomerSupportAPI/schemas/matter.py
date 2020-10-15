@@ -1,6 +1,7 @@
 from datetime import date, datetime, time
 from typing import Optional, List
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, UUID4
+
 
 from CustomerSupportAPI.models.matter import MatterModel
 
@@ -9,8 +10,11 @@ from .calling import Calling
 
 class Matter(BaseModel):
 
+    id: UUID4
+    timestamp: datetime
+
     responder: constr(max_length=255, strip_whitespace=True)
-    caller: Calling
+    caller: Calling  # from schema/calling.py
     memo: str
 
     title: Optional[constr(max_length=255, strip_whitespace=True)] = None
@@ -20,12 +24,12 @@ class Matter(BaseModel):
     call_back_by: Optional[datetime] = None
 
     @classmethod
-    def from_model(cls, instance: MatterModel):
+    def from_model(cls, instance: MatterModel):  # convert django ORM to Pydantic
         return cls(
-            id=instance.id_,
+            id=instance.id,
             timestamp=instance.timestamp,
             responder=instance.responder,
-            caller=instance.caller,
+            caller=Calling.from_model(instance.caller),
             memo=instance.memo,
             title=instance.title,
             place=instance.place,

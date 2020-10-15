@@ -12,7 +12,7 @@ from phonenumbers import (
     parse as parse_phone_number,
 )
 from typing import Optional, List
-from pydantic import BaseModel, constr, validator
+from pydantic import BaseModel, constr, PositiveInt, validator
 
 MOBILE_NUMBER_TYPES = PhoneNumberType.MOBILE, PhoneNumberType.FIXED_LINE_OR_MOBILE
 
@@ -21,6 +21,7 @@ from CustomerSupportAPI.models.calling import CallingModel
 
 class Calling(BaseModel):
 
+    id: PositiveInt  # for default django auto-incremental ID
     name: constr(max_length=255, strip_whitespace=True)
     phone_number: constr(max_length=50, strip_whitespace=True)
 
@@ -43,7 +44,7 @@ class Calling(BaseModel):
         return cls(
             id=instance.id,
             name=instance.name,
-            phone_number=instance.phone_number,
+            phone_number=str(instance.phone_number),  # cf. https://github.com/stefanfoulis/django-phonenumber-field/blob/7a5d8010c182058dc8d0e1e20cf66f541860eb73/phonenumber_field/phonenumber.py#L34
             affiliation=instance.affiliation
         )
 
@@ -51,6 +52,6 @@ class Calling(BaseModel):
 class Callings(BaseModel):
     records: List[Calling]
 
-    @classmethod
+    @ classmethod
     def from_model_multiple(cls, instances):
         return cls(records=[Calling.from_model(inst) for inst in instances])

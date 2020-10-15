@@ -20,6 +20,6 @@ def get_matters(
 
 @router.get("/{matter_id}")
 def get_matter(
-    matter: MatterModel = Depends(adapter.retrieve_matter),
+    matter: MatterModel = Depends(adapter.retrieve_matter_by_id),
 ) -> Matter:
     return Matter.from_model(matter)
